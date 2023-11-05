@@ -5,6 +5,8 @@ public class SignUpDto {
     private String firstName;
     private String lastName;
     private String email;
+    private String userName;
+    private String interest;
     private String password;
 
     public String getFirstName() {
@@ -29,6 +31,22 @@ public class SignUpDto {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getInterest() {
+        return interest;
+    }
+
+    public void setInterest(String interest) {
+        this.interest = interest;
     }
 
     public String getPassword() {

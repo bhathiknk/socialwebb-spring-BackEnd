@@ -47,7 +47,7 @@ public class UserService {
         }
 
         User user = new User(signupDto.getFirstName(), signupDto.getLastName(),
-                signupDto.getEmail(), encryptedpassword);
+                signupDto.getEmail(), signupDto.getUserName(),signupDto.getInterest(),encryptedpassword);
 
         userRepository.save(user);
 
