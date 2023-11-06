@@ -28,7 +28,7 @@ public class SwaggerConfig {
     private ApiInfo getApiInfo() {
         Contact contact = new Contact("webtutsplus", "http://webtutsplus.com", "contact.webtutsplus@gmail.com");
         return new ApiInfoBuilder()
-                .title("Ecommerce API")
+                .title("Social Webb App API")
                 .description("Documentation Ecommerce api")
                 .version("1.0.0")
 
