@@ -9,6 +9,7 @@ public class SignUpDto {
     private String interest;
     private String password;
 
+
     public String getFirstName() {
         return firstName;
     }

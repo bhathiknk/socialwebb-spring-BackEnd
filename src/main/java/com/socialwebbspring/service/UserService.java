@@ -25,8 +25,10 @@ public class UserService {
     @Autowired
     UserRepository userRepository;
 
+
     @Autowired
     AuthenticationService authenticationService;
+
 
     @Transactional
     public ResponseDto signUp(SignUpDto signupDto) {
@@ -107,4 +109,10 @@ public class UserService {
 
         // return response
     }
+    public User getUserByToken(String token) {
+        authenticationService.authenticate(token); // Ensure the token is valid
+        return authenticationService.getUser(token);
+    }
+
+
 }
