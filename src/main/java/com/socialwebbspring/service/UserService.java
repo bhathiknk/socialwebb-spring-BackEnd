@@ -1,10 +1,7 @@
 package com.socialwebbspring.service;
 
 
-import com.socialwebbspring.dto.ResponseDto;
-import com.socialwebbspring.dto.SignInDto;
-import com.socialwebbspring.dto.SignInResponseDto;
-import com.socialwebbspring.dto.SignUpDto;
+import com.socialwebbspring.dto.*;
 import com.socialwebbspring.exceptions.AuthenticationFailException;
 import com.socialwebbspring.exceptions.CustomException;
 import com.socialwebbspring.model.AuthenticationToken;
@@ -18,6 +15,7 @@ import javax.xml.bind.DatatypeConverter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -49,7 +47,7 @@ public class UserService {
         }
 
         User user = new User(signupDto.getFirstName(), signupDto.getLastName(),
-                signupDto.getEmail(), signupDto.getUserName(),signupDto.getInterest(),encryptedpassword);
+                signupDto.getEmail(), signupDto.getUserName(),signupDto.getInterest(),encryptedpassword, signupDto.getProfileImage(), signupDto.getText());
 
         userRepository.save(user);
 
@@ -114,5 +112,16 @@ public class UserService {
         return authenticationService.getUser(token);
     }
 
+    public void updateUser(UserDetailsDto userDetailsDto, Integer id) throws Exception {
+        Optional<User> optionalUser = userRepository.findById(id);
+        // throw an exception if product does not exists
+        if (!optionalUser.isPresent()) {
+            throw new Exception("product not present");
+        }
+        User user = optionalUser.get();
+        user.setUserName(userDetailsDto.getUserName());
+        user.setEmail(userDetailsDto.getEmail());
+        userRepository.save(user);
+    }
 
 }

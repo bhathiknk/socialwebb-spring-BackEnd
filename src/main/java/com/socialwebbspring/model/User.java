@@ -31,6 +31,13 @@ public class User {
     @Column(name = "Password")
     private String password;
 
+    @Column(name = "profile_image")
+    private byte[] profileImage;
+
+    @Column(name = "bio")
+    private String text;
+
+
     public Integer getId() {
         return id;
     }
@@ -87,13 +94,32 @@ public class User {
         this.password = password;
     }
 
-    public User(String firstName, String lastName, String email, String userName, String interest, String password) {
+
+    public byte[] getProfileImage() {
+        return profileImage;
+    }
+
+    public void setProfileImage(byte[] profileImage) {
+        this.profileImage = profileImage;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public User(String firstName, String lastName, String email, String userName, String interest, String password, byte[] profileImage, String text) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.userName = userName;
         this.interest = interest;
         this.password = password;
+        this.profileImage = profileImage;
+        this.text = text;
     }
 
     public User() {
