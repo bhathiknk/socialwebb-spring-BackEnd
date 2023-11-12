@@ -116,11 +116,12 @@ public class UserService {
         Optional<User> optionalUser = userRepository.findById(id);
         // throw an exception if product does not exists
         if (!optionalUser.isPresent()) {
-            throw new Exception("product not present");
+            throw new Exception("user not present");
         }
         User user = optionalUser.get();
         user.setUserName(userDetailsDto.getUserName());
         user.setEmail(userDetailsDto.getEmail());
+        user.setText(userDetailsDto.getText());
         userRepository.save(user);
     }
 

@@ -21,7 +21,7 @@ public class UserDetailController {
         User user = userService.getUserByToken(token);
 
         if (user != null) {
-            UserDetailsDto userDetails = new UserDetailsDto(user.getUserName(), user.getEmail(),user.getId());
+            UserDetailsDto userDetails = new UserDetailsDto(user.getUserName(), user.getEmail(),user.getId(), user.getText());
             return new ResponseEntity<>(userDetails, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

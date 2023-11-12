@@ -5,6 +5,8 @@ public class UserDetailsDto {
     private String userName;
     private String email;
 
+    private String text;
+
     public Integer getId() {
         return Id;
     }
@@ -29,9 +31,20 @@ public class UserDetailsDto {
         this.email = email;
     }
 
-    public UserDetailsDto(String userName, String email,Integer Id) {
+
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public UserDetailsDto(String userName, String email,Integer Id,String text) {
         this.Id=Id;
         this.userName = userName;
         this.email = email;
+        this.text=text;
     }
 }
