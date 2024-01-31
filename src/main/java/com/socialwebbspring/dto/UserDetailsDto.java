@@ -1,11 +1,11 @@
 package com.socialwebbspring.dto;
-
 public class UserDetailsDto {
     private Integer Id;
+    private String profileImage;
     private String userName;
     private String email;
-
     private String text;
+
 
     public Integer getId() {
         return Id;
@@ -13,6 +13,14 @@ public class UserDetailsDto {
 
     public void setId(Integer id) {
         Id = id;
+    }
+
+    public String getProfileImage() {
+        return profileImage;
+    }
+
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
     }
 
     public String getUserName() {
@@ -31,8 +39,6 @@ public class UserDetailsDto {
         this.email = email;
     }
 
-
-
     public String getText() {
         return text;
     }
@@ -41,10 +47,11 @@ public class UserDetailsDto {
         this.text = text;
     }
 
-    public UserDetailsDto(String userName, String email,Integer Id,String text) {
-        this.Id=Id;
+    public UserDetailsDto(Integer id, String profileImage, String userName, String email, String text) {
+        Id = id;
+        this.profileImage = profileImage;
         this.userName = userName;
         this.email = email;
-        this.text=text;
+        this.text = text;
     }
 }

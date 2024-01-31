@@ -10,12 +10,17 @@ import com.socialwebbspring.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.web.multipart.MultipartFile;
 import javax.xml.bind.DatatypeConverter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -28,6 +33,7 @@ public class UserService {
     AuthenticationService authenticationService;
 
 
+    //Signup method
     @Transactional
     public ResponseDto signUp(SignUpDto signupDto) {
         // check if user is already present
@@ -37,7 +43,6 @@ public class UserService {
         }
 
         // hash the password
-
         String encryptedpassword = signupDto.getPassword();
 
         try {
@@ -47,7 +52,7 @@ public class UserService {
         }
 
         User user = new User(signupDto.getFirstName(), signupDto.getLastName(),
-                signupDto.getEmail(), signupDto.getUserName(),signupDto.getInterest(),encryptedpassword, signupDto.getProfileImage(), signupDto.getText());
+                signupDto.getEmail(), signupDto.getUserName(), signupDto.getInterest(), encryptedpassword, signupDto.getText());
 
         userRepository.save(user);
 
@@ -59,10 +64,16 @@ public class UserService {
 
         authenticationService.saveConfirmationToken(authenticationToken);
 
-        ResponseDto responseDto = new ResponseDto("success", "user created succesfully");
+        ResponseDto responseDto = new ResponseDto("success", "User created successfully");
         return responseDto;
     }
 
+
+
+
+
+
+    //password encript method
     private String hashPassword(String password) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("MD5");
         md.update(password.getBytes());
@@ -72,6 +83,12 @@ public class UserService {
         return hash;
     }
 
+
+
+
+
+
+    //signin method
     public SignInResponseDto signIn(SignInDto signInDto) {
         // find user by email
 
@@ -81,8 +98,7 @@ public class UserService {
             throw new AuthenticationFailException("user is not valid");
         }
 
-        // hash the password
-
+        // check hash password
         try {
             if (!user.getPassword().equals(hashPassword(signInDto.getPassword()))) {
                 throw new AuthenticationFailException("wrong password");
@@ -107,22 +123,51 @@ public class UserService {
 
         // return response
     }
+
+
+
+    //check user token
     public User getUserByToken(String token) {
         authenticationService.authenticate(token); // Ensure the token is valid
         return authenticationService.getUser(token);
     }
 
-    public void updateUser(UserDetailsDto userDetailsDto, Integer id) throws Exception {
+
+
+
+    //Update user details
+    @Transactional
+    public void updateUserDetails(Integer id, MultipartFile image, String userName, String email, String text) throws Exception {
         Optional<User> optionalUser = userRepository.findById(id);
-        // throw an exception if product does not exists
         if (!optionalUser.isPresent()) {
-            throw new Exception("user not present");
+            throw new Exception("User not found");
         }
+
         User user = optionalUser.get();
-        user.setUserName(userDetailsDto.getUserName());
-        user.setEmail(userDetailsDto.getEmail());
-        user.setText(userDetailsDto.getText());
+        user.setUserName(userName);
+        user.setEmail(email);
+        user.setBio(text);
+
+        if (image != null && !image.isEmpty()) {
+            String imageName = saveImage(image);
+            user.setProfileImage(imageName);
+        }
+
         userRepository.save(user);
     }
+
+
+
+    //Save image seperate directory
+    private String saveImage(MultipartFile image) throws IOException {
+        // You can customize the directory to save the images
+        String uploadDir = "C:/Projects/Group Project Module/Social Media App-Second Year Group Project/socialwebb-spring/src/main/resources/static/images";
+        String fileName = UUID.randomUUID().toString() + "_" + image.getOriginalFilename();
+        Path filePath = Path.of(uploadDir, fileName);
+        Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+        return fileName;
+    }
+
+
 
 }

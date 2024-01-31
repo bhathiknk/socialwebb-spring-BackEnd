@@ -1,5 +1,4 @@
 package com.socialwebbspring.controller;
-
 import com.socialwebbspring.dto.UserDetailsDto;
 import com.socialwebbspring.model.User;
 import com.socialwebbspring.service.UserService;
@@ -7,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @RestController
@@ -21,19 +21,37 @@ public class UserDetailController {
         User user = userService.getUserByToken(token);
 
         if (user != null) {
-            UserDetailsDto userDetails = new UserDetailsDto(user.getUserName(), user.getEmail(),user.getId(), user.getText());
+            UserDetailsDto userDetails = new UserDetailsDto(
+                    user.getId(),
+                    user.getProfileImage(),
+                    user.getUserName(),
+                    user.getEmail(),
+                    user.getBio()
+
+            );
             return new ResponseEntity<>(userDetails, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
-    @PostMapping("/update/{id}")
-    public ResponseEntity<ApiResponse> updateUser(@PathVariable("id") Integer id, @RequestBody UserDetailsDto userDetailsDto) throws Exception {
 
-        userService.updateUser(userDetailsDto, id);
-        return new ResponseEntity<ApiResponse>(new ApiResponse(true, "User Details has been updated"), HttpStatus.OK);
+    @PostMapping("/update/{id}")
+    public ResponseEntity<String> updateUserDetails(
+            @PathVariable Integer id,
+            @RequestParam("image") MultipartFile image,
+            @RequestParam("userName") String userName,
+            @RequestParam("email") String email,
+            @RequestParam("text") String text) {
+
+        try {
+            userService.updateUserDetails(id, image, userName, email, text);
+            return ResponseEntity.ok("User details updated successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error updating user details: " + e.getMessage());
+        }
     }
+
 
     public class ApiResponse {
         private boolean success;

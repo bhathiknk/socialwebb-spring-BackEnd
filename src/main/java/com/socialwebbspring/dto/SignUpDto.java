@@ -1,5 +1,7 @@
 package com.socialwebbspring.dto;
 
+import org.springframework.web.multipart.MultipartFile;
+
 public class SignUpDto {
 
     private String firstName;
@@ -8,7 +10,6 @@ public class SignUpDto {
     private String userName;
     private String interest;
     private String password;
-    private byte[] profileImage;
     private String text;
 
     public String getFirstName() {
@@ -55,17 +56,6 @@ public class SignUpDto {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public byte[] getProfileImage() {
-        return profileImage;
-    }
-
-    public void setProfileImage(byte[] profileImage) {
-        this.profileImage = profileImage;
-    }
 
     public String getText() {
         return text;

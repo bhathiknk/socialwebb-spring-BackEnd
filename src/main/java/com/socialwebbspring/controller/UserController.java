@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+
 @RequestMapping("user")
 @RestController
 public class UserController {
@@ -23,7 +25,7 @@ public class UserController {
     // signup
 
     @PostMapping("/signup")
-    public ResponseDto signup(@RequestBody SignUpDto signupDto) {
+    public ResponseDto signup(@RequestBody SignUpDto signupDto) throws IOException {
         return userService.signUp(signupDto);
     }
 

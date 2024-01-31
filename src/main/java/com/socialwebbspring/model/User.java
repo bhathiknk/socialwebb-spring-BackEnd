@@ -32,10 +32,10 @@ public class User {
     private String password;
 
     @Column(name = "profile_image")
-    private byte[] profileImage;
+    private String profileImage;
 
-    @Column(name = "bio")
-    private String text;
+    @Column(name = "bio", columnDefinition = "TEXT")
+    private String bio;
 
 
     public Integer getId() {
@@ -94,32 +94,32 @@ public class User {
         this.password = password;
     }
 
-
-    public byte[] getProfileImage() {
+    public String getProfileImage() {
         return profileImage;
     }
 
-    public void setProfileImage(byte[] profileImage) {
+    public void setProfileImage(String profileImage) {
         this.profileImage = profileImage;
     }
 
-    public String getText() {
-        return text;
+    public String getBio() {
+        return bio;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public void setBio(String bio) {
+        this.bio = bio;
     }
 
-    public User(String firstName, String lastName, String email, String userName, String interest, String password, byte[] profileImage, String text) {
+    public User(String firstName, String lastName, String email, String userName, String interest, String password, String bio) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.userName = userName;
         this.interest = interest;
         this.password = password;
-        this.profileImage = profileImage;
-        this.text = text;
+        this.profileImage=profileImage;
+        this.bio = this.bio;
+
     }
 
     public User() {
