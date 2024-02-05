@@ -135,7 +135,6 @@ public class UserService {
 
 
 
-    //Update user details
     @Transactional
     public void updateUserDetails(Integer id, MultipartFile image, String userName, String email, String text) throws Exception {
         Optional<User> optionalUser = userRepository.findById(id);
@@ -144,17 +143,33 @@ public class UserService {
         }
 
         User user = optionalUser.get();
+        String oldProfileImage = user.getProfileImage(); // Get the old image filename
+
         user.setUserName(userName);
         user.setEmail(email);
         user.setBio(text);
 
         if (image != null && !image.isEmpty()) {
-            String imageName = saveImage(image);
-            user.setProfileImage(imageName);
+            // Save the new image
+            String newImageName = saveImage(image);
+            user.setProfileImage(newImageName);
+
+            // Remove the old image
+            if (oldProfileImage != null && !oldProfileImage.isEmpty()) {
+                removeImage(oldProfileImage);
+            }
         }
 
         userRepository.save(user);
     }
+
+    // Add a method to remove the old image
+    private void removeImage(String imageName) throws IOException {
+        String uploadDir = "C:/Projects/Group Project Module/Social Media App-Second Year Group Project/socialwebb-spring/src/main/resources/static/images";
+        Path filePath = Path.of(uploadDir, imageName);
+        Files.deleteIfExists(filePath);
+    }
+
 
 
 
