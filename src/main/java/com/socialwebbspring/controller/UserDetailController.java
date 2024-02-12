@@ -84,8 +84,7 @@ public class UserDetailController {
 
     // Method to retrieve the image file as InputStream
     private InputStream getImageInputStream(String imageName) throws IOException {
-        // Assuming your directory path is "C:/Projects/Group Project Module/Social Media App-Second Year Group Project/socialwebb-spring/src/main/resources/static/images"
-        // You may need to adapt this based on your actual project structure
+
         String directoryPath = "C:/Projects/Group Project Module/Social Media App-Second Year Group Project/socialwebb-spring/src/main/resources/static/images";
 
         // Use Paths.get to create a Path object

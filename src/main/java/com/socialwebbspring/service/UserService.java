@@ -1,6 +1,5 @@
 package com.socialwebbspring.service;
 
-
 import com.socialwebbspring.dto.*;
 import com.socialwebbspring.exceptions.AuthenticationFailException;
 import com.socialwebbspring.exceptions.CustomException;
@@ -11,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,113 +28,84 @@ public class UserService {
     @Autowired
     UserRepository userRepository;
 
-
     @Autowired
     AuthenticationService authenticationService;
 
-
-    //Signup method
+    // Signup method
     @Transactional
     public ResponseDto signUp(SignUpDto signupDto) {
-        // check if user is already present
+        // Check if user is already present
         if (Objects.nonNull(userRepository.findByEmail(signupDto.getEmail()))) {
-            // we have an user
+            // User already exists
             throw new CustomException("User already present");
         }
 
-        // hash the password
+        // Hash the password
         String encryptedpassword = signupDto.getPassword();
-
         try {
             encryptedpassword = hashPassword(signupDto.getPassword());
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
 
+        // Create a new user
         User user = new User(signupDto.getFirstName(), signupDto.getLastName(),
                 signupDto.getEmail(), signupDto.getUserName(), signupDto.getInterest(), encryptedpassword, signupDto.getText());
 
-        userRepository.save(user);
+        userRepository.save(user);  // Save the user to the repository
 
-        // save the user
-
-        // create the token
-
+        // Create authentication token
         final AuthenticationToken authenticationToken = new AuthenticationToken(user);
-
         authenticationService.saveConfirmationToken(authenticationToken);
 
         ResponseDto responseDto = new ResponseDto("success", "User created successfully");
         return responseDto;
     }
 
-
-
-
-
-
-    //password encript method
+    // Password encrypt method
     private String hashPassword(String password) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("MD5");
         md.update(password.getBytes());
         byte[] digest = md.digest();
-        String hash = DatatypeConverter
-                .printHexBinary(digest).toUpperCase();
+        String hash = DatatypeConverter.printHexBinary(digest).toUpperCase();
         return hash;
     }
 
-
-
-
-
-
-    //signin method
+    // Sign in method
     public SignInResponseDto signIn(SignInDto signInDto) {
-        // find user by email
-
+        // Find user by email
         User user = userRepository.findByEmail(signInDto.getEmail());
 
         if (Objects.isNull(user)) {
-            throw new AuthenticationFailException("user is not valid");
+            throw new AuthenticationFailException("User is not valid");
         }
 
-        // check hash password
+        // Check hashed password
         try {
             if (!user.getPassword().equals(hashPassword(signInDto.getPassword()))) {
-                throw new AuthenticationFailException("wrong password");
+                throw new AuthenticationFailException("Wrong password");
             }
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
 
-        // compare the password in DB
-
-        // if password match
-
+        // Retrieve authentication token
         AuthenticationToken token = authenticationService.getToken(user);
 
-        // retrive the token
-
         if (Objects.isNull(token)) {
-            throw new CustomException("token is not present");
+            throw new CustomException("Token is not present");
         }
 
-        return new SignInResponseDto("sucess", token.getToken());
-
-        // return response
+        return new SignInResponseDto("success", token.getToken());
     }
 
-
-
-    //check user token
+    // Check user token
     public User getUserByToken(String token) {
         authenticationService.authenticate(token); // Ensure the token is valid
         return authenticationService.getUser(token);
     }
 
-
-
-
+    // Update user details method
     @Transactional
     public void updateUserDetails(Integer id, MultipartFile image, String userName, String email, String text) throws Exception {
         Optional<User> optionalUser = userRepository.findById(id);
@@ -145,6 +116,7 @@ public class UserService {
         User user = optionalUser.get();
         String oldProfileImage = user.getProfileImage(); // Get the old image filename
 
+        // Update user details
         user.setUserName(userName);
         user.setEmail(email);
         user.setBio(text);
@@ -163,26 +135,20 @@ public class UserService {
         userRepository.save(user);
     }
 
-    // Add a method to remove the old image
+    // Remove the old image
     private void removeImage(String imageName) throws IOException {
         String uploadDir = "C:/Projects/Group Project Module/Social Media App-Second Year Group Project/socialwebb-spring/src/main/resources/static/images";
         Path filePath = Path.of(uploadDir, imageName);
         Files.deleteIfExists(filePath);
     }
 
-
-
-
-    //Save image seperate directory
+    // Save image to a separate directory
     private String saveImage(MultipartFile image) throws IOException {
-        // You can customize the directory to save the images
+        // Customize the directory to save the images
         String uploadDir = "C:/Projects/Group Project Module/Social Media App-Second Year Group Project/socialwebb-spring/src/main/resources/static/images";
         String fileName = UUID.randomUUID().toString() + "_" + image.getOriginalFilename();
         Path filePath = Path.of(uploadDir, fileName);
         Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
         return fileName;
     }
-
-
-
 }
