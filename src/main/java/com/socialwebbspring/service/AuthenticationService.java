@@ -44,4 +44,8 @@ public class AuthenticationService {
             throw new AuthenticationFailException("token not valid");
         }
     }
+    public AuthenticationToken getTokenByToken(String token) {
+        return tokenRepository.findByToken(token);
+    }
+
 }

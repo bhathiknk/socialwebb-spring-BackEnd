@@ -63,4 +63,9 @@ public class AuthenticationToken {
 
     public AuthenticationToken() {
     }
+
+    public Integer getUserIdFromToken() {
+        return this.user.getId();
+    }
+
 }

@@ -10,7 +10,6 @@ public class SignInResponseDto {
     public SignInResponseDto(String status, String token) {
         this.status = status;
         this.token = token;
-        this.userId=userId;
     }
 
     public String getStatus() {

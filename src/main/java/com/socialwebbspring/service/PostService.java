@@ -1,6 +1,8 @@
 package com.socialwebbspring.service;
 
 import com.socialwebbspring.dto.PostDto;
+import com.socialwebbspring.exceptions.AuthenticationFailException;
+import com.socialwebbspring.model.AuthenticationToken;
 import com.socialwebbspring.model.Post;
 import com.socialwebbspring.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +18,19 @@ public class PostService {
     @Autowired
     private PostRepository postRepository;
 
-    public void createPost(PostDto postDTO, MultipartFile imageFile) throws IOException {
+    @Autowired
+    private AuthenticationService authenticationService;
+
+    public void createPost(PostDto postDTO, MultipartFile imageFile, String token) throws IOException {
+        AuthenticationToken authenticationToken = authenticationService.getTokenByToken(token);
+        if (authenticationToken == null) {
+            throw new AuthenticationFailException("Invalid token");
+        }
+
+        Integer userId = authenticationToken.getUserIdFromToken();
+
         Post post = new Post();
-        post.setUserId(postDTO.getUserId()); // Assuming getUserId is correct in your PostDto
+        post.setUserId(userId);
         post.setCaption(postDTO.getCaption());
         post.setTags(postDTO.getTags());
 
