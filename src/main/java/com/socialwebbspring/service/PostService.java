@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 @Service
 public class PostService {
@@ -46,4 +47,10 @@ public class PostService {
         // Save the post to the database
         postRepository.save(post);
     }
+
+    // Add a new method to retrieve posts by user ID
+    public List<Post> getPostsByUserId(Integer userId) {
+        return postRepository.findByUserId(userId);
+    }
+
 }
