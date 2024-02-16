@@ -61,7 +61,6 @@ public class UserDetailController {
         }
     }
 
-
     @GetMapping("/images/{imageName}")
     public ResponseEntity<Resource> getImage(@PathVariable String imageName) throws IOException {
         // Assuming you have a method to retrieve the image file as InputStream
