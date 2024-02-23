@@ -38,24 +38,6 @@ public class UserController {
         return userService.signIn(signInDto);
     }
 
-    @GetMapping("/suggested-friends")
-    public ResponseEntity<List<User>> getSuggestedFriends(@RequestHeader("Authorization") String authorizationHeader) {
-        // Extract the token from the authorization header
-        String token = authorizationHeader.substring("Bearer ".length());
-
-        // Authenticate the user based on the token
-        User authenticatedUser = userService.getUserByToken(token);
-
-        if (authenticatedUser != null) {
-            // User is authenticated, proceed to fetch suggested friends
-            List<User> suggestedFriends = userService.getSuggestedFriends(authenticatedUser.getId());
-            return ResponseEntity.ok(suggestedFriends);
-        } else {
-            // User is not authenticated, return unauthorized response
-            return ResponseEntity.status(401).build();
-        }
-    }
-
 
 
 }

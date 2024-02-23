@@ -151,21 +151,6 @@ public class UserService {
         return fileName;
     }
 
-    // Inside UserService class
-    @Transactional
-    public List<User> getSuggestedFriends(Integer userId) {
-        Optional<User> userOptional = userRepository.findById(userId);
 
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            String userInterest = user.getInterest();
-
-            if (userInterest != null && !userInterest.isEmpty()) {
-                return userRepository.findByInterestAndIdNot(userInterest, userId);
-            }
-        }
-
-        return Collections.emptyList();
-    }
 
 }

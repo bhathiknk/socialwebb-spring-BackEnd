@@ -27,8 +27,8 @@ public class Webconfig {
 
         @Override
         public void addResourceHandlers(ResourceHandlerRegistry registry) {
-            registry.addResourceHandler("/images/**")
-                    .addResourceLocations("classpath:/static/images/");
+            registry.addResourceHandler("/static/images/**")
+                    .addResourceLocations("file:C:/Projects/Group Project Module/Social Media App-Second Year Group Project/socialwebb-spring/src/main/resources/static/images/");
         }
     }
 

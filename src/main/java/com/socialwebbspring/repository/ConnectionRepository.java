@@ -8,11 +8,8 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Integer> {
-
-    User findByEmail(String email);
-    Optional<User> findById(Integer id);
-
+public interface ConnectionRepository extends JpaRepository<User, Integer> {
+    
+    List<User> findByInterestAndIdNot(String userInterest, Integer userId);
 
 }
-
