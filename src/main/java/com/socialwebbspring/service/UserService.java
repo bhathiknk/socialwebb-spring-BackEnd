@@ -7,6 +7,7 @@ import com.socialwebbspring.model.AuthenticationToken;
 import com.socialwebbspring.model.User;
 import com.socialwebbspring.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,9 +19,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -151,4 +150,22 @@ public class UserService {
         Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
         return fileName;
     }
+
+    // Inside UserService class
+    @Transactional
+    public List<User> getSuggestedFriends(Integer userId) {
+        Optional<User> userOptional = userRepository.findById(userId);
+
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            String userInterest = user.getInterest();
+
+            if (userInterest != null && !userInterest.isEmpty()) {
+                return userRepository.findByInterestAndIdNot(userInterest, userId);
+            }
+        }
+
+        return Collections.emptyList();
+    }
+
 }

@@ -48,7 +48,7 @@ public class PostService {
         postRepository.save(post);
     }
 
-    // Add a new method to retrieve posts by user ID
+    // method to retrieve posts by user ID
     public List<Post> getPostsByUserId(Integer userId) {
         return postRepository.findByUserId(userId);
     }
