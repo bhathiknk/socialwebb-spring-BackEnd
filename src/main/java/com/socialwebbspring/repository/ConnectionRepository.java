@@ -12,4 +12,5 @@ public interface ConnectionRepository extends JpaRepository<User, Integer> {
     
     List<User> findByInterestAndIdNot(String userInterest, Integer userId);
 
+
 }

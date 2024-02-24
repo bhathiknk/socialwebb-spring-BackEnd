@@ -39,5 +39,30 @@ public class ConnectionController {
         }
     }
 
+
+    // Inside ConnectionController.java
+    @PostMapping("/send-friend-request/{friendId}")
+    public ResponseEntity<String> sendFriendRequest(@RequestHeader("Authorization") String authorizationHeader, @PathVariable Integer friendId) {
+        // Extract the token from the authorization header
+        String token = authorizationHeader.substring("Bearer ".length());
+
+        // Authenticate the user based on the token
+        User authenticatedUser = userService.getUserByToken(token);
+
+        if (authenticatedUser != null) {
+            // User is authenticated, proceed to send friend request
+            boolean requestSent = connectionService.sendFriendRequest(authenticatedUser.getId(), friendId);
+
+            if (requestSent) {
+                return ResponseEntity.ok("Friend request sent successfully");
+            } else {
+                return ResponseEntity.badRequest().body("Friend request could not be sent");
+            }
+        } else {
+            // User is not authenticated, return unauthorized response
+            return ResponseEntity.status(401).body("User not authenticated");
+        }
+    }
+
 }
 
