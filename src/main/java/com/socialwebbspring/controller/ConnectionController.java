@@ -63,6 +63,24 @@ public class ConnectionController {
             return ResponseEntity.status(401).body("User not authenticated");
         }
     }
+    // Inside ConnectionController.java
+    @GetMapping("/pending-connection-requests")
+    public ResponseEntity<List<UserDetailsDto>> getPendingConnectionRequests(@RequestHeader("Authorization") String authorizationHeader) {
+        // Extract the token from the authorization header
+        String token = authorizationHeader.substring("Bearer ".length());
+
+        // Authenticate the user based on the token
+        User authenticatedUser = userService.getUserByToken(token);
+
+        if (authenticatedUser != null) {
+            // User is authenticated, proceed to fetch pending connection requests
+            List<UserDetailsDto> pendingRequests = connectionService.getPendingConnectionRequests(authenticatedUser.getId());
+            return ResponseEntity.ok(pendingRequests);
+        } else {
+            // User is not authenticated, return unauthorized response
+            return ResponseEntity.status(401).build();
+        }
+    }
 
 }
 

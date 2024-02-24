@@ -78,6 +78,19 @@ public class ConnectionService {
                 connectionRequestRepository.existsBySenderAndReceiver(user2, user1);
     }
 
+    // Inside ConnectionService.java
+    // Inside ConnectionService.java
+    @Transactional
+    public List<UserDetailsDto> getPendingConnectionRequests(Integer userId) {
+        // Fetch pending connection requests for the specified user
+        List<User> pendingRequests = connectionRequestRepository.findPendingConnectionRequests(userId);
+
+        // Convert User entities to UserDetailsDto with profileImage
+        return pendingRequests.stream()
+                .map(u -> new UserDetailsDto(u.getId(), u.getProfileImage(), u.getUserName(), u.getEmail(), u.getBio()))
+                .collect(Collectors.toList());
+    }
+
 
 }
 
