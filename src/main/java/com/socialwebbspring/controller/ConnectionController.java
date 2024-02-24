@@ -82,5 +82,30 @@ public class ConnectionController {
         }
     }
 
+
+    @PostMapping("/accept-connection/{friendId}")
+    public ResponseEntity<String> acceptConnection(@RequestHeader("Authorization") String authorizationHeader, @PathVariable Integer friendId) {
+        // Extract the token from the authorization header
+        String token = authorizationHeader.substring("Bearer ".length());
+
+        // Authenticate the user based on the token
+        User authenticatedUser = userService.getUserByToken(token);
+
+        if (authenticatedUser != null) {
+            // User is authenticated, proceed to accept connection
+            User friendUser = userService.getUserById(friendId);
+
+            if (friendUser != null) {
+                connectionService.acceptConnection(authenticatedUser, friendUser);
+                return ResponseEntity.ok("Connection accepted successfully");
+            } else {
+                return ResponseEntity.badRequest().body("Friend not found");
+            }
+        } else {
+            // User is not authenticated, return unauthorized response
+            return ResponseEntity.status(401).body("User not authenticated");
+        }
+    }
+
 }
 

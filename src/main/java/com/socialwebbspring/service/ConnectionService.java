@@ -1,5 +1,6 @@
 package com.socialwebbspring.service;
 import com.socialwebbspring.dto.UserDetailsDto;
+import com.socialwebbspring.model.Connection;
 import com.socialwebbspring.model.ConnectionRequest;
 import com.socialwebbspring.model.User;
 import com.socialwebbspring.repository.ConnectionRepository;
@@ -29,17 +30,18 @@ public class ConnectionService {
     @Autowired
     private ConnectionRequestRepository connectionRequestRepository ;
 
+
     // Inside ConnectionService class
     @Transactional
     public List<UserDetailsDto> getSuggestedFriends(Integer userId) {
-        Optional<User> userOptional = connectionRepository.findById(userId);
+        Optional<User> userOptional = userRepository.findById(userId);
 
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             String userInterest = user.getInterest();
 
             if (userInterest != null && !userInterest.isEmpty()) {
-                List<User> suggestedFriends = connectionRepository.findByInterestAndIdNot(userInterest, userId);
+                List<User> suggestedFriends = userRepository.findByInterestAndIdNot(userInterest, userId);
 
                 // Convert User entities to UserDetailsDto with profileImage
                 return suggestedFriends.stream()
@@ -91,6 +93,21 @@ public class ConnectionService {
                 .collect(Collectors.toList());
     }
 
+
+
+    @Transactional
+    public void acceptConnection(User user1, User user2) {
+        // Check if a connection already exists (bidirectional check)
+        if (!connectionRepository.findByUser1AndUser2(user1, user2).isPresent() &&
+                !connectionRepository.findByUser1AndUser2(user2, user1).isPresent()) {
+
+            // Create a new connection
+            Connection connection = new Connection();
+            connection.setUser1(user1);
+            connection.setUser2(user2);
+            connectionRepository.save(connection);
+        }
+    }
 
 }
 
