@@ -15,9 +15,12 @@ import java.util.Optional;
 public interface ConnectionRepository extends JpaRepository<Connection, Integer> {
     Optional<Connection> findByUser1AndUser2(User user1, User user2);
 
-    @Query("SELECT c.user2 FROM Connection c WHERE c.user1.id = :userId AND c.user2.id <> :userId " +
-            "OR c.user2.id = :userId AND c.user1.id <> :userId")
-    List<User> findFriends(@Param("userId") Integer userId);
+    @Query("SELECT c.user1 FROM Connection c WHERE c.user2.id = :userId")
+    List<User> findFriendsForUser2(@Param("userId") Integer userId);
+
+    @Query("SELECT c.user2 FROM Connection c WHERE c.user1.id = :userId")
+    List<User> findFriendsForUser1(@Param("userId") Integer userId);
+
 
     boolean existsByUser1IdAndUser2Id(Integer user1Id, Integer user2Id);
 }

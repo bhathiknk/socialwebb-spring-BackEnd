@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class ConnectionService {
@@ -130,22 +131,20 @@ public class ConnectionService {
 
 
 
-    // Inside ConnectionService.java
-    // Inside ConnectionService.java
     @Transactional
     public List<UserDetailsDto> getFriends(Integer userId) {
-        List<User> friends = connectionRepository.findFriends(userId);
+        List<User> friendsForUser1 = connectionRepository.findFriendsForUser1(userId);
+        List<User> friendsForUser2 = connectionRepository.findFriendsForUser2(userId);
 
-        // Exclude the logged-in user from the list of friends
-        friends = friends.stream()
-                .filter(u -> !u.getId().equals(userId))
+        List<User> allFriends = Stream.concat(friendsForUser1.stream(), friendsForUser2.stream())
+                .distinct()
                 .collect(Collectors.toList());
 
-        // Convert User entities to UserDetailsDto with profileImage
-        return friends.stream()
+        return allFriends.stream()
                 .map(u -> new UserDetailsDto(u.getId(), u.getProfileImage(), u.getUserName(), u.getEmail(), u.getBio()))
                 .collect(Collectors.toList());
     }
+
 
 
 }
