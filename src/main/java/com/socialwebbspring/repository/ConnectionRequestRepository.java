@@ -16,4 +16,7 @@ public interface ConnectionRequestRepository extends JpaRepository<ConnectionReq
     boolean existsBySenderAndReceiver(User sender, User receiver);
     @Query("SELECT r.sender FROM ConnectionRequest r WHERE r.receiver.id = :userId")
     List<User> findPendingConnectionRequests(@Param("userId") Integer userId);
+
+
+    void deleteBySenderAndReceiver(User sender, User receiver);
 }

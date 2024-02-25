@@ -106,8 +106,31 @@ public class ConnectionService {
             connection.setUser1(user1);
             connection.setUser2(user2);
             connectionRepository.save(connection);
+
+            // Remove the accepted connection request
+            connectionRequestRepository.deleteBySenderAndReceiver(user2, user1);
         }
     }
+
+
+
+    // Inside ConnectionService.java
+    // Inside ConnectionService.java
+    @Transactional
+    public List<UserDetailsDto> getFriends(Integer userId) {
+        List<User> friends = connectionRepository.findFriends(userId);
+
+        // Exclude the logged-in user from the list of friends
+        friends = friends.stream()
+                .filter(u -> !u.getId().equals(userId))
+                .collect(Collectors.toList());
+
+        // Convert User entities to UserDetailsDto with profileImage
+        return friends.stream()
+                .map(u -> new UserDetailsDto(u.getId(), u.getProfileImage(), u.getUserName(), u.getEmail(), u.getBio()))
+                .collect(Collectors.toList());
+    }
+
 
 }
 
