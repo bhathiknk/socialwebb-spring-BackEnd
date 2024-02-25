@@ -40,6 +40,7 @@ public class ConnectionController {
     }
 
 
+
     // Inside ConnectionController.java
     @PostMapping("/send-friend-request/{friendId}")
     public ResponseEntity<String> sendFriendRequest(@RequestHeader("Authorization") String authorizationHeader, @PathVariable Integer friendId) {
@@ -128,4 +129,3 @@ public class ConnectionController {
     }
 
 }
-

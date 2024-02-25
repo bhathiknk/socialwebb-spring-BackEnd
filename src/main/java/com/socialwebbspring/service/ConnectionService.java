@@ -31,7 +31,6 @@ public class ConnectionService {
     private ConnectionRequestRepository connectionRequestRepository ;
 
 
-    // Inside ConnectionService class
     @Transactional
     public List<UserDetailsDto> getSuggestedFriends(Integer userId) {
         Optional<User> userOptional = userRepository.findById(userId);
@@ -41,7 +40,15 @@ public class ConnectionService {
             String userInterest = user.getInterest();
 
             if (userInterest != null && !userInterest.isEmpty()) {
-                List<User> suggestedFriends = userRepository.findByInterestAndIdNot(userInterest, userId);
+                // Fetch suggested friends excluding those who have pending connection requests from the logged-in user
+                List<User> suggestedFriends = userRepository.findSuggestedFriends(userId, userInterest);
+
+                // Exclude the logged-in user, users who have received a friend request from the logged-in user,
+                // and users who are already friends with the logged-in user
+                suggestedFriends = suggestedFriends.stream()
+                        .filter(u -> !u.getId().equals(userId) && !hasReceivedFriendRequest(userId, u.getId())
+                                && !areFriends(userId, u.getId()))
+                        .collect(Collectors.toList());
 
                 // Convert User entities to UserDetailsDto with profileImage
                 return suggestedFriends.stream()
@@ -52,6 +59,16 @@ public class ConnectionService {
 
         return Collections.emptyList();
     }
+    private boolean hasReceivedFriendRequest(Integer senderId, Integer receiverId) {
+        // Check if a friend request already exists in either direction
+        return connectionRequestRepository.existsBySenderAndReceiver(userRepository.getById(senderId), userRepository.getById(receiverId)) ||
+                connectionRequestRepository.existsBySenderAndReceiver(userRepository.getById(receiverId), userRepository.getById(senderId));
+    }
+    private boolean areFriends(Integer user1Id, Integer user2Id) {
+        // Check if users are friends in either direction
+        return connectionRepository.existsByUser1IdAndUser2Id(user1Id, user2Id) || connectionRepository.existsByUser1IdAndUser2Id(user2Id, user1Id);
+    }
+
 
 
     // Inside ConnectionService.java
@@ -80,8 +97,7 @@ public class ConnectionService {
                 connectionRequestRepository.existsBySenderAndReceiver(user2, user1);
     }
 
-    // Inside ConnectionService.java
-    // Inside ConnectionService.java
+
     @Transactional
     public List<UserDetailsDto> getPendingConnectionRequests(Integer userId) {
         // Fetch pending connection requests for the specified user
@@ -133,4 +149,3 @@ public class ConnectionService {
 
 
 }
-
