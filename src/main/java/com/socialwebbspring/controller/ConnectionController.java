@@ -128,4 +128,27 @@ public class ConnectionController {
         }
     }
 
+
+    // Inside ConnectionController.java
+
+    @GetMapping("/pending-connection-requests-images")
+    public ResponseEntity<List<String>> getPendingConnectionRequestsImages(@RequestHeader("Authorization") String authorizationHeader) {
+        // Extract the token from the authorization header
+        String token = authorizationHeader.substring("Bearer ".length());
+
+        // Authenticate the user based on the token
+        User authenticatedUser = userService.getUserByToken(token);
+
+        if (authenticatedUser != null) {
+            // User is authenticated, proceed to fetch profile images of users with pending connection requests
+            List<String> profileImages = connectionService.getPendingConnectionRequestsImages(authenticatedUser.getId());
+            return ResponseEntity.ok(profileImages);
+        } else {
+            // User is not authenticated, return unauthorized response
+            return ResponseEntity.status(401).build();
+        }
+    }
+
+
 }
+

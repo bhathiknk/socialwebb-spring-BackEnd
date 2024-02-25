@@ -145,6 +145,14 @@ public class ConnectionService {
                 .collect(Collectors.toList());
     }
 
+// Inside ConnectionService.java
+
+    @Transactional
+    public List<String> getPendingConnectionRequestsImages(Integer userId) {
+        // Fetch profile images of users with pending connection requests
+        List<String> profileImages = connectionRequestRepository.findSentFriendRequestsImages(userId);
+        return profileImages;
+    }
 
 
 }

@@ -18,5 +18,9 @@ public interface ConnectionRequestRepository extends JpaRepository<ConnectionReq
     List<User> findPendingConnectionRequests(@Param("userId") Integer userId);
 
 
+    @Query("SELECT r.receiver.profileImage FROM ConnectionRequest r WHERE r.sender.id = :userId")
+    List<String> findSentFriendRequestsImages(@Param("userId") Integer userId);
+
+
     void deleteBySenderAndReceiver(User sender, User receiver);
 }
