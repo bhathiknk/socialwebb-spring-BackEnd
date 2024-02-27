@@ -33,23 +33,22 @@ public class PostController {
     }
 
     // Endpoint to get posts for a specific user
-    @GetMapping("/user/{userId}/posts")
-    public ResponseEntity<List<Post>> getUserPosts(@PathVariable(name = "userId") String userId) {
-        if (userId.equals("null")) {
-            // Handle the case where userId is "null" (e.g., return an empty list)
-            return ResponseEntity.ok(Collections.emptyList());
-        }
+    // Add a new method to get posts by user token
+    @GetMapping("/user/posts")
+    public ResponseEntity<List<Post>> getUserPostsByToken(@RequestHeader("Authorization") String token) {
         try {
-            Integer userIdValue = Integer.parseInt(userId);
-            List<Post> userPosts = postService.getPostsByUserId(userIdValue);
-
-            // You might want to add additional error handling if userPosts is null or empty
+            List<Post> userPosts = postService.getPostsByUserToken(token);
             return ResponseEntity.ok(userPosts);
-        } catch (NumberFormatException e) {
-            // Handle the case where userId is not a valid integer
-            return ResponseEntity.badRequest().build();
+        } catch (AuthenticationFailException e) {
+            return ResponseEntity.status(401).body(Collections.emptyList());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Collections.emptyList());
         }
     }
+
+
+
+
 
 
 }

@@ -49,8 +49,17 @@ public class PostService {
     }
 
     // method to retrieve posts by user ID
-    public List<Post> getPostsByUserId(Integer userId) {
+    // Add a new method to retrieve posts by user token
+    public List<Post> getPostsByUserToken(String token) {
+        AuthenticationToken authenticationToken = authenticationService.getTokenByToken(token);
+        if (authenticationToken == null) {
+            throw new AuthenticationFailException("Invalid token");
+        }
+
+        Integer userId = authenticationToken.getUserIdFromToken();
         return postRepository.findByUserId(userId);
     }
+
+
 
 }
