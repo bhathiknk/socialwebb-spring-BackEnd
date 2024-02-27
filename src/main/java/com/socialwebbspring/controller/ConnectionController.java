@@ -182,21 +182,6 @@ public class ConnectionController {
         }
     }
 
-    @GetMapping("/post-images/{imageName}")
-    public ResponseEntity<InputStreamResource> getPostImage(@PathVariable String imageName) {
-        try {
-            ClassPathResource imageFile = new ClassPathResource("static/posts/" + imageName);
-            return ResponseEntity
-                    .ok()
-                    .contentType(MediaType.IMAGE_JPEG)  // Adjust the MediaType based on your image type
-                    .body(new InputStreamResource(imageFile.getInputStream()));
-        } catch (IOException e) {
-            // Handle file not found or other errors
-            return ResponseEntity
-                    .notFound()
-                    .build();
-        }
-    }
 
 }
 

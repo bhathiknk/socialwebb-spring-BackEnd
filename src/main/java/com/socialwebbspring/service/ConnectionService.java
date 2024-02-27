@@ -175,11 +175,22 @@ public class ConnectionService {
                 allFriends.stream().map(User::getId).collect(Collectors.toList())
         );
 
-        // Convert Post entities to PostDto
+        // Convert Post entities to PostDto with user information
         return friendsPosts.stream()
-                .map(post -> new PostDto(post.getUserId(), post.getCaption(), post.getTags(), post.getPostImage()))
+                .map(post -> {
+                    User  user = post.getUser(); // Assuming you have a relationship between Post and User
+                    return new PostDto(
+                            user.getId(),
+                            user.getUserName(),
+                            user.getProfileImage(),
+                            post.getCaption(),
+                            post.getTags(),
+                            post.getPostImage()
+                    );
+                })
                 .collect(Collectors.toList());
     }
+
 
 
 }

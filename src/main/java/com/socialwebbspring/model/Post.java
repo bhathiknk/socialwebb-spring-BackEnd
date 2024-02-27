@@ -1,7 +1,6 @@
 package com.socialwebbspring.model;
 
 import javax.persistence.*;
-
 @Entity
 @Table(name = "posts")
 public class Post {
@@ -10,8 +9,9 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "user_Id")
-    private Integer userId;
+    @ManyToOne // Many posts can be associated with one user
+    @JoinColumn(name = "user_Id", referencedColumnName = "id")
+    private User user;
 
     @Column(name = "post_image")
     private String postImage;
@@ -27,7 +27,6 @@ public class Post {
 
     // Getters and setters
 
-
     public Integer getId() {
         return id;
     }
@@ -36,12 +35,12 @@ public class Post {
         this.id = id;
     }
 
-    public Integer getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(Integer userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getPostImage() {
@@ -76,3 +75,4 @@ public class Post {
         this.tags = tags;
     }
 }
+

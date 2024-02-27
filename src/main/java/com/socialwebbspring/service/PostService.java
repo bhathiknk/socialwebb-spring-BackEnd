@@ -33,7 +33,12 @@ public class PostService {
         Integer userId = authenticationToken.getUserIdFromToken();
 
         Post post = new Post();
-        post.setUserId(userId);
+
+        // Instead of setUserId, use setUser
+        User user = new User();
+        user.setId(userId);
+        post.setUser(user);
+
         post.setCaption(postDTO.getCaption());
         post.setTags(postDTO.getTags());
 
@@ -49,6 +54,7 @@ public class PostService {
         // Save the post to the database
         postRepository.save(post);
     }
+
 
     // method to retrieve posts by user ID
     // Add a new method to retrieve posts by user token
