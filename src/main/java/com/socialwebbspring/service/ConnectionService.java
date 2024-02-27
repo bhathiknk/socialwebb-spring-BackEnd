@@ -1,10 +1,13 @@
 package com.socialwebbspring.service;
+import com.socialwebbspring.dto.PostDto;
 import com.socialwebbspring.dto.UserDetailsDto;
 import com.socialwebbspring.model.Connection;
 import com.socialwebbspring.model.ConnectionRequest;
+import com.socialwebbspring.model.Post;
 import com.socialwebbspring.model.User;
 import com.socialwebbspring.repository.ConnectionRepository;
 import com.socialwebbspring.repository.ConnectionRequestRepository;
+import com.socialwebbspring.repository.PostRepository;
 import com.socialwebbspring.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,6 +33,8 @@ public class ConnectionService {
 
     @Autowired
     private ConnectionRequestRepository connectionRequestRepository ;
+    @Autowired
+    PostRepository postRepository;
 
 
     @Transactional
@@ -152,6 +157,28 @@ public class ConnectionService {
         // Fetch profile images of users with pending connection requests
         List<String> profileImages = connectionRequestRepository.findSentFriendRequestsImages(userId);
         return profileImages;
+    }
+
+    // Inside ConnectionService.java
+    @Transactional
+    public List<PostDto> getFriendsPosts(Integer userId) {
+        // Fetch friends for the specified user
+        List<User> friendsForUser1 = connectionRepository.findFriendsForUser1(userId);
+        List<User> friendsForUser2 = connectionRepository.findFriendsForUser2(userId);
+
+        List<User> allFriends = Stream.concat(friendsForUser1.stream(), friendsForUser2.stream())
+                .distinct()
+                .collect(Collectors.toList());
+
+        // Fetch posts for all friends
+        List<Post> friendsPosts = postRepository.findByUserIds(
+                allFriends.stream().map(User::getId).collect(Collectors.toList())
+        );
+
+        // Convert Post entities to PostDto
+        return friendsPosts.stream()
+                .map(post -> new PostDto(post.getUserId(), post.getCaption(), post.getTags(), post.getPostImage()))
+                .collect(Collectors.toList());
     }
 
 

@@ -1,13 +1,25 @@
 package com.socialwebbspring.dto;
 
+// Inside PostDto.java
 public class PostDto {
 
     private Integer userId;
     private String caption;
     private String tags;
+    private String postImage;
+
+    // Constructors
+    public PostDto() {
+    }
+
+    public PostDto(Integer userId, String caption, String tags, String postImage) {
+        this.userId = userId;
+        this.caption = caption;
+        this.tags = tags;
+        this.postImage = postImage;
+    }
 
     // Getters and setters
-
 
     public Integer getUserId() {
         return userId;
@@ -33,5 +45,11 @@ public class PostDto {
         this.tags = tags;
     }
 
+    public String getPostImage() {
+        return postImage;
+    }
 
+    public void setPostImage(String postImage) {
+        this.postImage = postImage;
+    }
 }

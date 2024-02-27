@@ -1,13 +1,27 @@
 // ConnectionController.java
 package com.socialwebbspring.controller;
+import com.socialwebbspring.dto.PostDto;
 import com.socialwebbspring.dto.UserDetailsDto;
 import com.socialwebbspring.model.User;
 import com.socialwebbspring.service.ConnectionService;
 import com.socialwebbspring.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -149,6 +163,40 @@ public class ConnectionController {
         }
     }
 
+    // Inside ConnectionController.java
+    @GetMapping("/friends-posts")
+    public ResponseEntity<List<PostDto>> getFriendsPosts(@RequestHeader("Authorization") String authorizationHeader) {
+        // Extract the token from the authorization header
+        String token = authorizationHeader.substring("Bearer ".length());
+
+        // Authenticate the user based on the token
+        User authenticatedUser = userService.getUserByToken(token);
+
+        if (authenticatedUser != null) {
+            // User is authenticated, proceed to fetch posts of friends
+            List<PostDto> friendsPosts = connectionService.getFriendsPosts(authenticatedUser.getId());
+            return ResponseEntity.ok(friendsPosts);
+        } else {
+            // User is not authenticated, return unauthorized response
+            return ResponseEntity.status(401).build();
+        }
+    }
+
+    @GetMapping("/post-images/{imageName}")
+    public ResponseEntity<InputStreamResource> getPostImage(@PathVariable String imageName) {
+        try {
+            ClassPathResource imageFile = new ClassPathResource("static/posts/" + imageName);
+            return ResponseEntity
+                    .ok()
+                    .contentType(MediaType.IMAGE_JPEG)  // Adjust the MediaType based on your image type
+                    .body(new InputStreamResource(imageFile.getInputStream()));
+        } catch (IOException e) {
+            // Handle file not found or other errors
+            return ResponseEntity
+                    .notFound()
+                    .build();
+        }
+    }
 
 }
 

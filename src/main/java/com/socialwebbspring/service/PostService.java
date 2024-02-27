@@ -4,6 +4,7 @@ import com.socialwebbspring.dto.PostDto;
 import com.socialwebbspring.exceptions.AuthenticationFailException;
 import com.socialwebbspring.model.AuthenticationToken;
 import com.socialwebbspring.model.Post;
+import com.socialwebbspring.model.User;
 import com.socialwebbspring.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PostService {
@@ -62,4 +64,8 @@ public class PostService {
 
 
 
-}
+
+    }
+
+
+
