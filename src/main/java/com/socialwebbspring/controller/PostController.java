@@ -3,7 +3,11 @@ package com.socialwebbspring.controller;
 import com.socialwebbspring.dto.PostDto;
 import com.socialwebbspring.exceptions.AuthenticationFailException;
 import com.socialwebbspring.model.Post;
+import com.socialwebbspring.model.User;
+import com.socialwebbspring.service.ConnectionService;
 import com.socialwebbspring.service.PostService;
+import com.socialwebbspring.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +21,13 @@ public class PostController {
 
     private final PostService postService;
 // call the create post frontend
+
+    @Autowired
+    private ConnectionService connectionService;
+
+    @Autowired
+    UserService userService;
+
     public PostController(PostService postService) {
         this.postService = postService;
     }
@@ -46,7 +57,23 @@ public class PostController {
         }
     }
 
+    @GetMapping("/friends-posts")
+    public ResponseEntity<List<PostDto>> getFriendsPosts(@RequestHeader("Authorization") String authorizationHeader) {
+        // Extract the token from the authorization header
+        String token = authorizationHeader.substring("Bearer ".length());
 
+        // Authenticate the user based on the token
+        User authenticatedUser = userService.getUserByToken(token);
+
+        if (authenticatedUser != null) {
+            // User is authenticated, proceed to fetch posts of friends
+            List<PostDto> friendsPosts = connectionService.getFriendsPosts(authenticatedUser.getId());
+            return ResponseEntity.ok(friendsPosts);
+        } else {
+            // User is not authenticated, return unauthorized response
+            return ResponseEntity.status(401).build();
+        }
+    }
 
 
 

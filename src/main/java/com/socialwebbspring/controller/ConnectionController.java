@@ -164,23 +164,7 @@ public class ConnectionController {
     }
 
     // Inside ConnectionController.java
-    @GetMapping("/friends-posts")
-    public ResponseEntity<List<PostDto>> getFriendsPosts(@RequestHeader("Authorization") String authorizationHeader) {
-        // Extract the token from the authorization header
-        String token = authorizationHeader.substring("Bearer ".length());
 
-        // Authenticate the user based on the token
-        User authenticatedUser = userService.getUserByToken(token);
-
-        if (authenticatedUser != null) {
-            // User is authenticated, proceed to fetch posts of friends
-            List<PostDto> friendsPosts = connectionService.getFriendsPosts(authenticatedUser.getId());
-            return ResponseEntity.ok(friendsPosts);
-        } else {
-            // User is not authenticated, return unauthorized response
-            return ResponseEntity.status(401).build();
-        }
-    }
 
 
 }
