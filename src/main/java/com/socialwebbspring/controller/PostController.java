@@ -8,12 +8,22 @@ import com.socialwebbspring.service.ConnectionService;
 import com.socialwebbspring.service.PostService;
 import com.socialwebbspring.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.CacheControl;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/posts")
@@ -32,16 +42,17 @@ public class PostController {
         this.postService = postService;
     }
     @PostMapping("/create")
-    public ResponseEntity<String> createPost(@ModelAttribute PostDto postDTO,
-                                             @RequestParam("image") MultipartFile imageFile,
-                                             @RequestHeader("Authorization") String token) {
+    public ResponseEntity<PostDto> createPost(@ModelAttribute PostDto postDTO,
+                                              @RequestParam("image") MultipartFile imageFile,
+                                              @RequestHeader("Authorization") String token) {
         try {
-            postService.createPost(postDTO, imageFile, token);
-            return ResponseEntity.ok("Post created successfully");
+            PostDto createdPost = postService.createPost(postDTO, imageFile, token);
+            return ResponseEntity.ok(createdPost);
         } catch (IOException | AuthenticationFailException e) {
-            return ResponseEntity.status(500).body("Error creating post: " + e.getMessage());
+            return ResponseEntity.status(500).body(null);
         }
     }
+
 
     // Endpoint to get posts for a specific user
     // Add a new method to get posts by user token
@@ -76,6 +87,42 @@ public class PostController {
     }
 
 
+    @GetMapping("/postImages/{imageName}")
+    public ResponseEntity<Resource> getImage(@PathVariable String imageName) throws IOException {
+        // Assuming you have a method to retrieve the image file as InputStream
+        InputStream imageStream = getImageInputStream(imageName);
 
+        if (imageStream != null) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setCacheControl(CacheControl.maxAge(1, TimeUnit.DAYS).cachePublic()); // Cache image for 1 day
+            headers.setExpires(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(1));
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentType(MediaType.IMAGE_JPEG)
+                    .body(new InputStreamResource(imageStream));
+        } else {
+            // Handle case where image is not found
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // Method to retrieve the image file as InputStream
+    private InputStream getImageInputStream(String imageName) throws IOException {
+
+        String directoryPath = "C:/Projects/Group Project Module/Social Media App-Second Year Group Project/socialwebb-spring/src/main/resources/static/posts";
+
+        // Use Paths.get to create a Path object
+        Path imagePath = Paths.get(directoryPath, imageName);
+
+        // Check if the file exists
+        if (Files.exists(imagePath)) {
+            // Use Files.newInputStream to get the InputStream
+            return Files.newInputStream(imagePath);
+        } else {
+            // Return null if the image is not found
+            return null;
+        }
+    }
 
 }

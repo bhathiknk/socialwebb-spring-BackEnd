@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -24,7 +25,8 @@ public class PostService {
     @Autowired
     private AuthenticationService authenticationService;
 
-    public void createPost(PostDto postDTO, MultipartFile imageFile, String token) throws IOException {
+    @Transactional
+    public PostDto createPost(PostDto postDTO, MultipartFile imageFile, String token) throws IOException {
         AuthenticationToken authenticationToken = authenticationService.getTokenByToken(token);
         if (authenticationToken == null) {
             throw new AuthenticationFailException("Invalid token");
@@ -33,8 +35,6 @@ public class PostService {
         Integer userId = authenticationToken.getUserIdFromToken();
 
         Post post = new Post();
-
-        // Instead of setUserId, use setUser
         User user = new User();
         user.setId(userId);
         post.setUser(user);
@@ -53,6 +53,20 @@ public class PostService {
 
         // Save the post to the database
         postRepository.save(post);
+
+        // Convert the saved post to PostDto before returning
+        return convertToPostDto(post);
+    }
+
+    private PostDto convertToPostDto(Post post) {
+        return new PostDto(
+                post.getUser().getId(),
+                post.getUser().getUserName(),
+                post.getUser().getProfileImage(),
+                post.getCaption(),
+                post.getTags(),
+                post.getPostImage()
+        );
     }
 
 
