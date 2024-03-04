@@ -1,0 +1,7 @@
+Journal Entry: Date: 2024-03-08
+Mood: test user1
+Goals: test user 1
+
+Content:
+
+<p>test user 1</p>
