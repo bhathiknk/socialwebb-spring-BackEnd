@@ -1,7 +1,9 @@
 package com.socialwebbspring.controller;
 
+import com.socialwebbspring.dto.CommentDTO;
 import com.socialwebbspring.dto.QuestionDTO;
 import com.socialwebbspring.exceptions.AuthenticationFailException;
+import com.socialwebbspring.model.Comment;
 import com.socialwebbspring.model.Question;
 import com.socialwebbspring.service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,5 +44,25 @@ public class QuestionController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
+    }
+
+    @PostMapping("/comments")
+    public ResponseEntity<String> saveComment(
+            @RequestHeader(name = "Authorization") String token,
+            @RequestBody CommentDTO commentDTO) {
+        try {
+            questionService.saveComment(token, commentDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Comment saved successfully");
+        } catch (AuthenticationFailException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/comments/{questionId}")
+    public ResponseEntity<List<Comment>> getCommentsByQuestionId(@PathVariable Integer questionId) {
+        List<Comment> comments = questionService.getCommentsByQuestionId(questionId);
+        return new ResponseEntity<>(comments, HttpStatus.OK);
     }
 }

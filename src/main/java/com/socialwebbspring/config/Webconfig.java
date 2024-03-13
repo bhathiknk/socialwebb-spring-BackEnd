@@ -35,4 +35,7 @@ public class Webconfig {
                     .addResourceLocations("file:C:/Projects/Group Project Module/Social Media App-Second Year Group Project/socialwebb-spring/src/main/resources/static/posts/");
         }
     }
+
+
+
 }
