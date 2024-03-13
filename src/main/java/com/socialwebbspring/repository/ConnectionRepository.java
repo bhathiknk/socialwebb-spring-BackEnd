@@ -2,6 +2,7 @@ package com.socialwebbspring.repository;
 
 
 import com.socialwebbspring.model.Connection;
+import com.socialwebbspring.model.Question;
 import com.socialwebbspring.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -23,4 +24,8 @@ public interface ConnectionRepository extends JpaRepository<Connection, Integer>
 
 
     boolean existsByUser1IdAndUser2Id(Integer user1Id, Integer user2Id);
+    @Query("SELECT c.user2.id FROM Connection c WHERE c.user1.id = :userId")
+    List<Integer> findFriendIdsByUserId(@Param("userId") Integer userId);
+
+
 }

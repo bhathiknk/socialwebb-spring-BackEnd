@@ -1,6 +1,5 @@
 package com.socialwebbspring.service;
 
-
 import com.socialwebbspring.exceptions.AuthenticationFailException;
 import com.socialwebbspring.model.AuthenticationToken;
 import com.socialwebbspring.model.User;
@@ -24,7 +23,6 @@ public class AuthenticationService {
         return tokenRepository.findByUser(user);
     }
 
-
     public User getUser(String token) {
         final AuthenticationToken authenticationToken = tokenRepository.findByToken(token);
         if(Objects.isNull(authenticationToken)) {
@@ -38,14 +36,14 @@ public class AuthenticationService {
         // null check
         if(Objects.isNull(token)) {
             // throw an exception
-            throw new AuthenticationFailException("token not present");
+            throw new AuthenticationFailException("Token not present");
         }
         if(Objects.isNull(getUser(token))) {
-            throw new AuthenticationFailException("token not valid");
+            throw new AuthenticationFailException("Token not valid");
         }
     }
+
     public AuthenticationToken getTokenByToken(String token) {
         return tokenRepository.findByToken(token);
     }
-
 }
