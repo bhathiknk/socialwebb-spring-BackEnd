@@ -8,6 +8,7 @@ import com.socialwebbspring.repository.ModuleQuestionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -32,5 +33,14 @@ public class ModuleQuestionService {
         moduleQuestion.setModuleAnswer(moduleQuestionDTO.getModuleAnswer());
 
         moduleQuestionRepository.save(moduleQuestion);
+    }
+
+    public List<ModuleQuestion> getModuleQuestionsByUserIdAndModuleId(String token, Integer moduleId) throws AuthenticationFailException {
+        authenticationService.authenticate(token);
+
+        AuthenticationToken authToken = authenticationService.getTokenByToken(token);
+        Integer userId = authToken.getUserIdFromToken();
+
+        return moduleQuestionRepository.findByUserIdAndModuleId(userId, moduleId);
     }
 }
