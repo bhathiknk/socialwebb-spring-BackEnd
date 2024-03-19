@@ -71,6 +71,7 @@ public class PostController {
     @GetMapping("/friends-posts")
     public ResponseEntity<List<PostDto>> getFriendsPosts(@RequestHeader("Authorization") String authorizationHeader) {
         // Extract the token from the authorization header
+        System.out.println("Authorization Header: " + authorizationHeader);
         String token = authorizationHeader.substring("Bearer ".length());
 
         // Authenticate the user based on the token
