@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -56,6 +57,23 @@ public class QuestionService {
         questionRepository.save(question);
     }
 
+
+
+
+    public List<Question> getQuestionsByUser(String token) throws AuthenticationFailException {
+        // Authenticate the user
+        authenticationService.authenticate(token);
+
+        // Get the user from token
+        User user = authenticationService.getUser(token);
+        if (user == null) {
+            throw new AuthenticationFailException("User not found");
+        }
+
+        // Fetch questions posted by the user
+        return questionRepository.findByUser(user);
+    }
+
     public List<Question> getQuestionsByFriends(String token) throws AuthenticationFailException {
         // Extract userId from token
         User user = authenticationService.getUser(token);
@@ -63,14 +81,40 @@ public class QuestionService {
             throw new AuthenticationFailException("User not found");
         }
 
-        // Fetch friends for the specified user
-        List<User> friends = connectionRepository.findFriendsForUser1(user.getId());
-        // Add the user itself to include its own questions
-        friends.add(user);
+        // Fetch friends for the specified user (both requester and accepter)
+        List<User> friends = new ArrayList<>();
+
+        // Fetch users who have accepted the friend request
+        List<User> acceptedFriends = connectionRepository.findAcceptedFriendsForUser(user.getId());
+        friends.addAll(acceptedFriends);
+
+        // Fetch users who have sent the friend request (requester)
+        List<User> requestedFriends = connectionRepository.findRequestedFriendsForUser(user.getId());
+        friends.addAll(requestedFriends);
 
         // Fetch questions posted by friends
-        return questionRepository.findByUserIn(friends);
+        List<Question> questions = questionRepository.findByUserIn(friends);
+
+        // Filter out questions where the user is the owner
+        questions = questions.stream()
+                .filter(question -> !question.getUser().equals(user))
+                .collect(Collectors.toList());
+
+        return questions;
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public void saveComment(String token, CommentDTO commentDTO) throws AuthenticationFailException {
         // Authenticate the user

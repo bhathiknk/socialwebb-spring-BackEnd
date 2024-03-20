@@ -22,10 +22,14 @@ public interface ConnectionRepository extends JpaRepository<Connection, Integer>
     @Query("SELECT c.user2 FROM Connection c WHERE c.user1.id = :userId")
     List<User> findFriendsForUser1(@Param("userId") Integer userId);
 
+    @Query("SELECT c.user1 FROM Connection c WHERE c.user2.id = :userId")
+    List<User> findAcceptedFriendsForUser(@Param("userId") Integer userId);
+
+    @Query("SELECT c.user2 FROM Connection c WHERE c.user1.id = :userId")
+    List<User> findRequestedFriendsForUser(@Param("userId") Integer userId);
 
     boolean existsByUser1IdAndUser2Id(Integer user1Id, Integer user2Id);
+
     @Query("SELECT c.user2.id FROM Connection c WHERE c.user1.id = :userId")
     List<Integer> findFriendIdsByUserId(@Param("userId") Integer userId);
-
-
 }

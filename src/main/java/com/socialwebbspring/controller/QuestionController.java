@@ -46,6 +46,21 @@ public class QuestionController {
         }
     }
 
+
+    @GetMapping("/questions/my")
+    public ResponseEntity<List<Question>> getQuestionsByUser(
+            @RequestHeader(name = "Authorization") String token) {
+        try {
+            List<Question> questions = questionService.getQuestionsByUser(token);
+            return ResponseEntity.ok(questions);
+        } catch (AuthenticationFailException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+
     @PostMapping("/comments")
     public ResponseEntity<String> saveComment(
             @RequestHeader(name = "Authorization") String token,

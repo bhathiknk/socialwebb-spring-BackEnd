@@ -11,6 +11,7 @@ import java.util.List;
 public interface QuestionRepository extends JpaRepository<Question, Integer> {
 
     List<Question> findByUserIn(List<User> users);
+    List<Question> findByUser(User user);
 
 
 }
