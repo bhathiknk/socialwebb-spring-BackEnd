@@ -29,4 +29,14 @@ public class SubjectGPAService {
     public void deleteSubject(int id) {
         subjectGPARepository.deleteById(id);
     }
+
+    public double calculateFinalGPA(int userId) {
+        List<SubjectGPA> subjects = subjectGPARepository.findByUserId(userId);
+        if (subjects.isEmpty()) {
+            return 0.0; // Or any default value you prefer
+        }
+        double totalGradePoints = subjects.stream().mapToDouble(SubjectGPA::getGpa).sum();
+        double totalCredits = subjects.size();
+        return totalGradePoints / totalCredits;
+    }
 }

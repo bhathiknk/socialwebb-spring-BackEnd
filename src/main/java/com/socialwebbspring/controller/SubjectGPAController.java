@@ -11,7 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/subjects")
@@ -86,6 +88,23 @@ public class SubjectGPAController {
             return ResponseEntity.ok("Subject deleted successfully");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to delete subject");
+        }
+    }
+
+    @GetMapping("/allWithFinalGPA")
+    public ResponseEntity<Map<String, Object>> getAllSubjectsWithFinalGPA(@RequestHeader("Authorization") String token) {
+        try {
+            int userId = extractUserIdFromToken(token);
+            List<SubjectGPA> subjects = subjectGPAService.getAllSubjects(userId);
+            double finalGPA = subjectGPAService.calculateFinalGPA(userId);
+            Map<String, Object> response = new HashMap<>();
+            response.put("subjects", subjects);
+            response.put("finalGPA", finalGPA);
+            return ResponseEntity.ok(response);
+        } catch (AuthenticationFailException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 }
