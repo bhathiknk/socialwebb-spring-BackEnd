@@ -53,21 +53,6 @@ public class PostController {
         }
     }
 
-
-    // Endpoint to get posts for a specific user
-    // Add a new method to get posts by user token
-    @GetMapping("/user/posts")
-    public ResponseEntity<List<Post>> getUserPostsByToken(@RequestHeader("Authorization") String token) {
-        try {
-            List<Post> userPosts = postService.getPostsByUserToken(token);
-            return ResponseEntity.ok(userPosts);
-        } catch (AuthenticationFailException e) {
-            return ResponseEntity.status(401).body(Collections.emptyList());
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(Collections.emptyList());
-        }
-    }
-
     @GetMapping("/friends-posts")
     public ResponseEntity<List<PostDto>> getFriendsPosts(@RequestHeader("Authorization") String authorizationHeader) {
         // Extract the token from the authorization header
@@ -125,5 +110,31 @@ public class PostController {
             return null;
         }
     }
+
+    @GetMapping("/user/my-posts")
+    public ResponseEntity<List<PostDto>> getMyPosts(@RequestHeader("Authorization") String token) {
+        try {
+            List<PostDto> myPosts = postService.getPostsByLoggedInUser(token);
+            return ResponseEntity.ok(myPosts);
+        } catch (AuthenticationFailException e) {
+            return ResponseEntity.status(401).body(Collections.emptyList());
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Collections.emptyList());
+        }
+    }
+
+
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<String> deletePost(@PathVariable Integer postId, @RequestHeader("Authorization") String token) {
+        try {
+            postService.deletePost(postId, token);
+            return ResponseEntity.ok("Post deleted successfully");
+        } catch (AuthenticationFailException e) {
+            return ResponseEntity.status(401).body("Unauthorized");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Internal Server Error");
+        }
+    }
+
 
 }

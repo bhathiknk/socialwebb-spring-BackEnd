@@ -10,10 +10,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -70,22 +75,57 @@ public class PostService {
     }
 
 
-    // method to retrieve posts by user ID
-    // Add a new method to retrieve posts by user token
-    public List<Post> getPostsByUserToken(String token) {
+    // Add a new method to retrieve posts created by the logged-in user
+    public List<PostDto> getPostsByLoggedInUser(String token) {
         AuthenticationToken authenticationToken = authenticationService.getTokenByToken(token);
         if (authenticationToken == null) {
             throw new AuthenticationFailException("Invalid token");
         }
 
         Integer userId = authenticationToken.getUserIdFromToken();
-        return postRepository.findByUserId(userId);
+
+        // Retrieve posts by the user ID
+        List<Post> userPosts = postRepository.findByUserId(userId);
+
+        // Convert Post entities to PostDto
+        return userPosts.stream()
+                .map(post -> {
+                    PostDto postDto = convertToPostDto(post);
+                    postDto.setId(post.getId()); // Set the ID field of the PostDto
+                    return postDto;
+                })
+                .collect(Collectors.toList());
     }
 
 
+    @Transactional
+    public void deletePost(Integer postId, String token) {
+        AuthenticationToken authenticationToken = authenticationService.getTokenByToken(token);
+        if (authenticationToken == null) {
+            throw new AuthenticationFailException("Invalid token");
+        }
 
+        // Check if the logged-in user owns the post
+        Post post = postRepository.findById(postId).orElse(null);
+        if (post == null || !post.getUser().getId().equals(authenticationToken.getUserIdFromToken())) {
+            throw new AuthenticationFailException("Unauthorized");
+        }
 
+        // Delete the post image from the backend saved file
+        String directoryPath = "C:/Projects/Group Project Module/Social Media App-Second Year Group Project/socialwebb-spring/src/main/resources/static/posts/";
+        String fileName = post.getPostImage();
+        if (fileName != null) {
+            File fileToDelete = new File(directoryPath + fileName);
+            if (fileToDelete.exists()) {
+                fileToDelete.delete();
+            }
+        }
+
+        // Delete the post from the database
+        postRepository.deleteById(postId);
     }
+
+}
 
 
 

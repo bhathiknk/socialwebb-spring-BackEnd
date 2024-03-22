@@ -11,4 +11,5 @@ import java.util.List;
 public interface ModuleQuestionRepository extends JpaRepository<ModuleQuestion, Integer> {
 
     List<ModuleQuestion> findByUserIdAndModuleId(Integer userId, Integer moduleId);
+    void deleteByModuleId(Integer moduleId);
 }

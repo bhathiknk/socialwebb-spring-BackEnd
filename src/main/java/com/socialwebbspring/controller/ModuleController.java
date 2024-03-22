@@ -33,10 +33,14 @@ public class ModuleController {
         }
     }
     @GetMapping("/modules")
-    public ResponseEntity<List<ModuleEntity>> getAllModules(
+    public ResponseEntity<List<ModuleDTO>> getAllModules(
             @RequestHeader(name = "Authorization") String token) {
         try {
-            List<ModuleEntity> modules = moduleService.getAllModules(token);
+            List<ModuleDTO> modules = moduleService.getAllModules(token);
+            System.out.println("Received module question data:");
+            for (ModuleDTO module : modules) {
+                System.out.println("Module ID: " + module.getId());
+            }
             return ResponseEntity.ok().body(modules);
         } catch (AuthenticationFailException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
@@ -44,4 +48,21 @@ public class ModuleController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
+
+
+    @DeleteMapping("/modules/{id}")
+    public ResponseEntity<String> deleteModuleById(
+            @RequestHeader(name = "Authorization") String token,
+            @PathVariable Integer id) {
+        try {
+            moduleService.deleteModuleAndQuestionsById(token, id);
+            return ResponseEntity.ok("Module deleted successfully");
+        } catch (AuthenticationFailException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
 }

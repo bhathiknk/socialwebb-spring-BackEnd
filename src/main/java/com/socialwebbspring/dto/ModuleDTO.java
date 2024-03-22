@@ -2,12 +2,10 @@ package com.socialwebbspring.dto;
 
 
 public class ModuleDTO {
-    private Integer id;
+    private Integer id; // Change to non-static
     private String moduleName;
-    private Integer userId;
 
     // Getters and setters
-
 
     public Integer getId() {
         return id;
@@ -23,13 +21,5 @@ public class ModuleDTO {
 
     public void setModuleName(String moduleName) {
         this.moduleName = moduleName;
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
     }
 }

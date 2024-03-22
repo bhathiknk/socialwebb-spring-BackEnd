@@ -17,7 +17,7 @@ public class ModuleQuestionController {
     @Autowired
     private ModuleQuestionService moduleQuestionService;
 
-    @PostMapping("/module-question")
+    @PostMapping("/module-question-create")
     public ResponseEntity<String> saveModuleQuestion(
             @RequestHeader(name = "Authorization") String token,
             @RequestBody ModuleQuestionDTO moduleQuestionDTO) {
@@ -44,4 +44,21 @@ public class ModuleQuestionController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+
+    @DeleteMapping("/module-question/{id}")
+    public ResponseEntity<String> deleteModuleQuestionById(
+            @RequestHeader(name = "Authorization") String token,
+            @PathVariable Integer id) {
+        try {
+            moduleQuestionService.deleteModuleQuestionById(token, id);
+            return ResponseEntity.ok("Module question deleted successfully");
+        } catch (AuthenticationFailException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+
 }
