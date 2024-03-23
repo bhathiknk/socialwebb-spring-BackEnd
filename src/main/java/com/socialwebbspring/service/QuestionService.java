@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -74,6 +75,33 @@ public class QuestionService {
         return questionRepository.findByUser(user);
     }
 
+    public void deleteQuestion(String token, Integer questionId) throws AuthenticationFailException {
+        // Authenticate the user
+        authenticationService.authenticate(token);
+
+        // Get the user from token
+        User user = authenticationService.getUser(token);
+        if (user == null) {
+            throw new AuthenticationFailException("User not found");
+        }
+
+        // Check if the user owns the question
+        Question question = questionRepository.findById(questionId).orElse(null);
+        if (question == null || !Objects.equals(question.getUser().getId(), user.getId())) {
+            throw new AuthenticationFailException("You are not authorized to delete this question");
+        }
+
+        // Delete associated comments first
+        List<Comment> comments = commentRepository.findByQuestionId(questionId);
+        commentRepository.deleteAll(comments);
+
+        // Delete the question
+        questionRepository.deleteById(questionId);
+    }
+
+
+
+
     public List<Question> getQuestionsByFriends(String token) throws AuthenticationFailException {
         // Extract userId from token
         User user = authenticationService.getUser(token);
@@ -102,18 +130,6 @@ public class QuestionService {
 
         return questions;
     }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     public void saveComment(String token, CommentDTO commentDTO) throws AuthenticationFailException {

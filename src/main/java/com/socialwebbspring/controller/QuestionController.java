@@ -80,4 +80,21 @@ public class QuestionController {
         List<Comment> comments = questionService.getCommentsByQuestionId(questionId);
         return new ResponseEntity<>(comments, HttpStatus.OK);
     }
+
+
+    @DeleteMapping("/questions/{questionId}")
+    public ResponseEntity<String> deleteQuestion(
+            @RequestHeader(name = "Authorization") String token,
+            @PathVariable Integer questionId) {
+        try {
+            questionService.deleteQuestion(token, questionId);
+            return ResponseEntity.ok("Question deleted successfully");
+        } catch (AuthenticationFailException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+
 }
