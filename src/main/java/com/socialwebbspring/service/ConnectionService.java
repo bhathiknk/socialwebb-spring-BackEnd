@@ -191,6 +191,10 @@ public class ConnectionService {
                 .collect(Collectors.toList());
     }
 
-
+    @Transactional
+    public void rejectConnection(User user1, User user2) {
+        // Remove the connection request
+        connectionRequestRepository.deleteBySenderAndReceiver(user2, user1);
+    }
 
 }

@@ -2,7 +2,9 @@
 package com.socialwebbspring.controller;
 import com.socialwebbspring.dto.PostDto;
 import com.socialwebbspring.dto.UserDetailsDto;
+import com.socialwebbspring.model.ConnectionRequest;
 import com.socialwebbspring.model.User;
+import com.socialwebbspring.repository.ConnectionRequestRepository;
 import com.socialwebbspring.service.ConnectionService;
 import com.socialwebbspring.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequestMapping("connection")
@@ -34,6 +37,8 @@ public class ConnectionController {
 
     @Autowired
     UserService userService;
+    @Autowired
+    ConnectionRequestRepository connectionRequestRepository;
 
     @GetMapping("/suggested-friends-details")
     public ResponseEntity<List<UserDetailsDto>> getSuggestedFriendsDetails(@RequestHeader("Authorization") String authorizationHeader) {
@@ -163,7 +168,30 @@ public class ConnectionController {
         }
     }
 
-    // Inside ConnectionController.java
+
+    @PostMapping("/reject-connection/{friendId}")
+    public ResponseEntity<String> rejectConnection(@RequestHeader("Authorization") String authorizationHeader, @PathVariable Integer friendId) {
+        // Extract the token from the authorization header
+        String token = authorizationHeader.substring("Bearer ".length());
+
+        // Authenticate the user based on the token
+        User authenticatedUser = userService.getUserByToken(token);
+
+        if (authenticatedUser != null) {
+            // User is authenticated, proceed to reject connection
+            User friendUser = userService.getUserById(friendId);
+
+            if (friendUser != null) {
+                connectionService.rejectConnection(authenticatedUser, friendUser);
+                return ResponseEntity.ok("Connection rejected successfully");
+            } else {
+                return ResponseEntity.badRequest().body("Friend not found");
+            }
+        } else {
+            // User is not authenticated, return unauthorized response
+            return ResponseEntity.status(401).body("User not authenticated");
+        }
+    }
 
 
 
