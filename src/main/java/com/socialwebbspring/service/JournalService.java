@@ -94,4 +94,28 @@ public class JournalService {
         String filePath = StringUtils.cleanPath(textStoragePath + "/" + textFileName);
         return Files.readString(Paths.get(filePath));
     }
+
+// Inside JournalService class
+
+    public Journal getJournalById(Integer id) {
+        return journalRepository.findById(id).orElse(null);
+    }
+
+    public void deleteJournalAndTextFile(Journal journal) throws IOException {
+        // Delete the text file associated with the journal entry
+        deleteTextFile(journal);
+
+        // Delete the journal entry from the database
+        journalRepository.delete(journal);
+    }
+
+    private void deleteTextFile(Journal journal) throws IOException {
+        String textFileName = journal.gettextFileName();
+        if (textFileName != null) {
+            String filePath = StringUtils.cleanPath(textStoragePath + "/" + textFileName);
+            Files.deleteIfExists(Paths.get(filePath));
+        }
+    }
+
+
 }

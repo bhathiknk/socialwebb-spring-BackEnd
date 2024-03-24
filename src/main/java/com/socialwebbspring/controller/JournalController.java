@@ -77,4 +77,35 @@ public class JournalController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    // Inside JournalController class
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteJournal(@PathVariable Integer id,
+                                              @RequestHeader(name = HttpHeaders.AUTHORIZATION) String authorizationHeader) {
+        String token = authorizationHeader.substring("Bearer ".length());
+        User loggedInUser = authenticationService.getUser(token);
+
+        if (loggedInUser == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        // Check if the journal entry belongs to the logged-in user
+        Journal journal = journalService.getJournalById(id);
+        if (journal == null || !journal.getUserId().equals(loggedInUser.getId())) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN); // Journal not found or doesn't belong to the user
+        }
+
+        // Delete the journal entry and associated text file
+        try {
+            journalService.deleteJournalAndTextFile(journal);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT); // Deletion successful
+        } catch (IOException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
+
 }
